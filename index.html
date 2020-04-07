@@ -1,89 +1,138 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Covid-19 Stats By Ontario Municipalities</title>
-    <style>
-        th, td, p, input {
-            font:14px Verdana;
-        }
-        table, th, td 
-        {
-            border: solid 1px #DDD;
-            border-collapse: collapse;
-            padding: 2px 3px;
-            text-align: center;
-        }
-        th {
-            font-weight:bold;
-        }
-    </style>
+	<title>Covid-19 Ontario</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--===============================================================================================-->
+	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="vendor/perfect-scrollbar/perfect-scrollbar.css">
+	<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="css/util.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<!--===============================================================================================-->
 </head>
 <body>
-    <input type="button" onclick="CreateTableFromJSON()" value="Waterloo Region" />
-    <p id="showData"></p>
-</body>
-
+<div class="limiter">
+	<div class="container-table100">
+		<div class="wrap-table100">
+			<div class="inner"><button onclick="CreateOneTable('https://vast-reaches-02757.herokuapp.com/api/york')">
+				<span>York Region</span>
+			</button> </div>
+			<div class="inner"> <button onclick="CreateTables('https://vast-reaches-02757.herokuapp.com/api/halton')">
+				<span>Halton Region</span>
+			</button> </div>
+			<div class="inner"> <button onclick="CreateTables('https://vast-reaches-02757.herokuapp.com/api/niagara')">
+				<span>Niagara Region</span>
+			</button> </div>
+			<div id="table100"> </div>
+		</div>
+	</div>
+</div>
 <script>
-    function mergeTables(tables) {
-        let mergedTable = [];
-        tables.forEach(table => {
-            mergedTable = mergedTable.concat(Array.from(table));
-        });
-        return mergedTable;
-    }
-    function CreateTableFromJSON() {
-        let myBooks;
-        const Http = new XMLHttpRequest();
-        const url='https://vast-reaches-02757.herokuapp.com/api/waterloo';
-        Http.open("GET", url);
-        Http.send();
-        Http.onreadystatechange = function() {
-        if (Http.readyState === 4 && Http.status === 200) {
-            console.log(JSON.parse(Http.responseText));
-            myBooks = Array.from(mergeTables(JSON.parse(Http.responseText)));
-        }
-                // EXTRACT VALUE FOR HTML HEADER. 
-        // ('Book ID', 'Book Name', 'Category' and 'Price')
-        let col = [];
-        for (let i = 0; i < myBooks.length; i++) {
-            for (let key in myBooks[i]) {
-                if (col.indexOf(key) === -1) {
-                    col.push(key);
-                }
-            }
-        }
+	async function CreateOneTable(url) {
+		let response = await fetch(url);
+		response = (await response.json()).tables.tbody;
 
-        // CREATE DYNAMIC TABLE.
-        let table = document.createElement("table");
+		/*Create table */
+		let table = document.createElement('table');
+		let tbody = document.createElement('tbody');
+		let th = document.createElement('thead');
+		table.appendChild(th);
+		table.appendChild(tbody);
 
-        // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
+		/*table header*/
+		let tr = document.createElement('tr');
+		tr.classList.add('table100-head');
+		for(let i = 0; i < response[0].length; i ++) {
+			let td = document.createElement('th');
+			td.classList.add(`column${i+1}`);
+			td.innerHTML = response[0][i];
+			tr.appendChild(td);
+		}
+		th.appendChild(tr);
 
-        let tr = table.insertRow(-1);                   // TABLE ROW.
+		/*push rows into table*/
+		for(let i = 1; i < response.length; i++) {
+			let tr = document.createElement('tr');
+			for(let j = 0; j < response[i].length; j++) {
+				let td = document.createElement('td');
+				td.classList.add(`column${j+1}`);
+				td.innerText = response[i][j];
+				tr.appendChild(td);
+			}
+			tbody.appendChild(tr);
+		}
 
-        // for (let i = 0; i < col.length; i++) {
-        //     let th = document.createElement("th");      // TABLE HEADER.
-        //     th.innerHTML = col[i];
-        //     tr.appendChild(th);
-        // }
+		// FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
+		let divContainer = document.getElementById('table100');
+		divContainer.innerHTML = '';
+		divContainer.appendChild(table);
+	}
+	async function CreateTables(url) {
+		let response = await fetch(url);
+		const resTables = (await response.json()).tables;
 
-        // ADD JSON DATA TO THE TABLE AS ROWS.
-        for (let i = 0; i < myBooks.length; i++) {
+		let divContainer = document.getElementById('table100');
+		divContainer.innerHTML = '';
 
-            tr = table.insertRow(-1);
+		resTables.forEach(element => {
+			let elementBody = element.tbody;
+			// CREATE DYNAMIC TABLE.
+			let table = document.createElement('table');
+			let tbody = document.createElement('tbody');
+			let th = document.createElement('thead');
+			table.appendChild(th);
+			table.appendChild(tbody);
 
-            for (let j = 0; j < col.length; j++) {
-                let tabCell = tr.insertCell(-1);
-                tabCell.innerHTML = myBooks[i][col[j]];
-            }
-        }
+			/*table header*/
+			let tr = document.createElement('tr');
+			tr.classList.add('table100-head');
+			for(let i = 0; i < elementBody[0].length; i ++) {
+				let td = document.createElement('th');
+				td.classList.add(`column${i+1}`);
+				td.innerHTML = elementBody[0][i];
+				tr.appendChild(td);
+			}
+			th.appendChild(tr);
 
-        // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
-        let divContainer = document.getElementById("showData");
-        divContainer.innerHTML = "";
-        divContainer.appendChild(table);
+			/*push rows into table*/
+			for(let i = 1; i < elementBody.length; i++) {
+				let tr = document.createElement('tr');
+				for(let j = 0; j < elementBody[i].length; j++) {
+					let td = document.createElement('td');
+					td.classList.add(`column${j+1}`);
+					td.innerText = elementBody[i][j];
+					tr.appendChild(td);
+				}
+				tbody.appendChild(tr);
+			}
 
-         }
-
-    }
+			// divContainer.innerHTML = "";
+			divContainer.appendChild(table);
+		});
+	}
 </script>
+
+
+<!--===============================================================================================-->
+<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+<!--===============================================================================================-->
+<script src="vendor/bootstrap/js/popper.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+<!--===============================================================================================-->
+<script src="vendor/select2/select2.min.js"></script>
+<!--===============================================================================================-->
+<script src="js/main.js"></script>
+
+</body>
 </html>
