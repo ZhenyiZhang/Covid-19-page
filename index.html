@@ -25,23 +25,35 @@
 <div class="limiter">
 	<div class="container-table100">
 		<div class="wrap-table100">
-			<div class="inner"><button onclick="CreateOneTable('https://vast-reaches-02757.herokuapp.com/api/york')">
+			<div class="inner"><button onclick="CreateOneTable(localurl + '/api/york')">
 				<span>York Region</span>
 			</button> </div>
-			<div class="inner"> <button onclick="CreateTables('https://vast-reaches-02757.herokuapp.com/api/halton')">
+			<div class="inner"> <button onclick="CreateTables(localurl + '/api/halton')">
 				<span>Halton Region</span>
 			</button> </div>
-			<div class="inner"> <button onclick="CreateTables('https://vast-reaches-02757.herokuapp.com/api/niagara')">
+			<div class="inner"> <button onclick="CreateTables(localurl + '/api/niagara')">
 				<span>Niagara Region</span>
+			</button> </div>
+			<div class="inner"> <button onclick="CreateOneTable(localurl + '/api/peel')">
+				<span>Peel Region</span>
+			</button> </div>
+			<div class="inner"> <button onclick="CreateTables(localurl + '/api/waterloo')">
+				<span>Waterloo Region</span>
+			</button> </div>
+			<div class="inner"> <button onclick="CreateTables(localurl + '/api/durham')">
+				<span>Durham Region</span>
 			</button> </div>
 			<div id="table100"> </div>
 		</div>
 	</div>
 </div>
 <script>
+	const localurl = 'http://localhost:5000';
+	const deployurl = 'https://vast-reaches-02757.herokuapp.com';
 	async function CreateOneTable(url) {
-		let response = await fetch(url);
-		response = (await response.json()).tables.tbody;
+		let response = await fetch(url, {mode: 'cors'});
+		/*response is the table body*/
+		response = (await response.json()).tbody;
 
 		/*Create table */
 		let table = document.createElement('table');
@@ -50,19 +62,22 @@
 		table.appendChild(th);
 		table.appendChild(tbody);
 
-		/*table header*/
-		let tr = document.createElement('tr');
-		tr.classList.add('table100-head');
-		for(let i = 0; i < response[0].length; i ++) {
-			let td = document.createElement('th');
-			td.classList.add(`column${i+1}`);
-			td.innerHTML = response[0][i];
-			tr.appendChild(td);
+		if(url !== url + '/api/peel') {
+			/*table header*/
+			let tr = document.createElement('tr');
+			tr.classList.add('table100-head');
+			for(let i = 0; i < response[0].length; i++) {
+				let td = document.createElement('th');
+				td.classList.add(`column${i+1}`);
+				td.innerHTML = response[0][i];
+				tr.appendChild(td);
+			}
+			th.appendChild(tr);
 		}
-		th.appendChild(tr);
 
 		/*push rows into table*/
-		for(let i = 1; i < response.length; i++) {
+		for(let i = 0; i < response.length; i++) {
+			if((url !== url + '/api/peel') && (i===0)) continue;
 			let tr = document.createElement('tr');
 			for(let j = 0; j < response[i].length; j++) {
 				let td = document.createElement('td');
@@ -79,12 +94,23 @@
 		divContainer.appendChild(table);
 	}
 	async function CreateTables(url) {
-		let response = await fetch(url);
-		const resTables = (await response.json()).tables;
-
+		/*find table100 container*/
 		let divContainer = document.getElementById('table100');
 		divContainer.innerHTML = '';
 
+		let response = await fetch(url);
+
+		/*when data is not usable*/
+		if(response.status === 401) {
+			const url = await response.json();
+			let link = document.createElement('a');
+			link.href = url;
+			link.innerHTML = 'The data is not accessible, click on this link';
+			divContainer.appendChild(link);
+			return
+		}
+
+		const resTables = (await response.json()).tables;
 		resTables.forEach(element => {
 			let elementBody = element.tbody;
 			// CREATE DYNAMIC TABLE.
