@@ -37,21 +37,46 @@
 			<div class="inner"> <button onclick="CreateOneTable(deployurl + '/api/peel')">
 				<span>Peel Region</span>
 			</button> </div>
-			<div class="inner"> <button onclick="CreateTables(deployurl + '/api/waterloo')">
+			<div class="inner"> <button onclick="getWaterlooTable()">
 				<span>Waterloo Region</span>
 			</button> </div>
 			<div class="inner"> <button onclick="CreateTables(deployurl + '/api/durham')">
 				<span>Durham Region</span>
+			</button></div>
+			<div class="inner"> <button onclick="CreateTables(deployurl + '/api/WDG')">
+				<span>WDG Region</span>
 			</button> </div>
-			<div id="table100"> </div>
+			<div id="table100">
+			</div>
 		</div>
 	</div>
 </div>
 <script>
+	/*two url for local and cloud testing*/
 	const localurl = 'http://localhost:5000';
 	const deployurl = 'https://vast-reaches-02757.herokuapp.com';
+
+	async function getWaterlooTable() {
+		/*get waterloo.html content*/
+		let page = await fetch('./embeddedTable/waterloo.html');
+		let divContainer = document.getElementById('table100');
+		/*insert waterloo.html inside 'table100'*/
+		divContainer.innerHTML = await page.text();
+		/*render table*/
+		let divElement = document.getElementById('viz1586456984033');
+		let vizElement = divElement.getElementsByTagName('object')[0];
+		if ( divElement.offsetWidth > 800 ) {
+			vizElement.style.width='800px';vizElement.style.height='2027px';}
+		else if ( divElement.offsetWidth > 500 ) {
+			vizElement.style.width='800px';vizElement.style.height='2027px';}
+		else { vizElement.style.width='100%';vizElement.style.height='2777px';}
+		let scriptElement = document.createElement('script');
+		scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+		vizElement.parentNode.insertBefore(scriptElement, vizElement);
+	}
+
 	async function CreateOneTable(url) {
-		let response = await fetch(url, {mode: 'cors'});
+		let response = await fetch(url);
 		/*response is the table body*/
 		response = (await response.json()).tbody;
 
@@ -161,4 +186,5 @@
 <script src="js/main.js"></script>
 
 </body>
+
 </html>
