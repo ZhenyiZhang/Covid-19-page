@@ -46,7 +46,7 @@
 			<div class="inner"> <button onclick="CreateTables(deployurl + '/api/WDG')">
 				<span>WDG Region</span>
 			</button> </div>
-			<div class="inner"> <button onclick="CreateOneTable(deployurl + '/api/toronto')">
+			<div class="inner"> <button onclick="getTorontoTable()">
 				<span>City of Toronto</span>
 			</button> </div>
 			<div id="table100">
@@ -74,6 +74,21 @@
 			vizElement.style.width='800px';vizElement.style.height='2027px';}
 		else { vizElement.style.width='100%';vizElement.style.height='2777px';}
 		let scriptElement = document.createElement('script');
+		scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+		vizElement.parentNode.insertBefore(scriptElement, vizElement);
+	}
+
+	async function getTorontoTable() {
+		/*get waterloo.html content*/
+		let page = await fetch('./embeddedTable/toronto.html');
+		let divContainer = document.getElementById('table100');
+		/*insert waterloo.html inside 'table100'*/
+		divContainer.innerHTML = await page.text();
+		/*render table*/
+		var divElement = document.getElementById('viz1586561412981');
+		var vizElement = divElement.getElementsByTagName('object')[0];
+		vizElement.style.width='980px';vizElement.style.height='2527px';
+		var scriptElement = document.createElement('script');
 		scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
 		vizElement.parentNode.insertBefore(scriptElement, vizElement);
 	}
