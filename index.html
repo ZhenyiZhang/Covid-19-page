@@ -85,10 +85,10 @@
 		/*insert waterloo.html inside 'table100'*/
 		divContainer.innerHTML = await page.text();
 		/*render table*/
-		var divElement = document.getElementById('viz1586561412981');
-		var vizElement = divElement.getElementsByTagName('object')[0];
+		let divElement = document.getElementById('viz1586561412981');
+		let vizElement = divElement.getElementsByTagName('object')[0];
 		vizElement.style.width='980px';vizElement.style.height='2527px';
-		var scriptElement = document.createElement('script');
+		let scriptElement = document.createElement('script');
 		scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
 		vizElement.parentNode.insertBefore(scriptElement, vizElement);
 	}
@@ -96,8 +96,47 @@
 	async function CreateOneTable(url) {
 		let response = await fetch(url);
 		/*response is the table body*/
-		response = (await response.json()).tbody;
+		response = await response.json();
+		/*get table 100*/
+		let divContainer = document.getElementById('table100');
+		divContainer.innerHTML = '';
 
+		/*if the data includes summary */
+		if(response.summary) {
+			let summary = response.summary;
+			// CREATE DYNAMIC TABLE.
+			let table = document.createElement('table');
+			let tbody = document.createElement('tbody');
+			let th = document.createElement('thead');
+			table.appendChild(th);
+			table.appendChild(tbody);
+
+			/*table header*/
+			let tr = document.createElement('tr');
+			tr.classList.add('table100-head');
+			for(let i = 0; i < summary[0].length; i ++) {
+				let td = document.createElement('th');
+				td.classList.add(`column${i+1}`);
+				td.innerHTML = summary[0][i];
+				tr.appendChild(td);
+			}
+			th.appendChild(tr);
+
+			/*push rows into table*/
+			for(let i = 1; i < summary.length; i++) {
+				let tr = document.createElement('tr');
+				for(let j = 0; j < summary[i].length; j++) {
+					let td = document.createElement('td');
+					td.classList.add(`column${j+1}`);
+					td.innerText = summary[i][j];
+					tr.appendChild(td);
+				}
+				tbody.appendChild(tr);
+			}
+			divContainer.appendChild(table);
+		}
+
+		response = response.tbody;
 		/*Create table */
 		let table = document.createElement('table');
 		let tbody = document.createElement('tbody');
@@ -132,10 +171,9 @@
 		}
 
 		// FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
-		let divContainer = document.getElementById('table100');
-		divContainer.innerHTML = '';
 		divContainer.appendChild(table);
 	}
+
 	async function CreateTables(url) {
 		/*find table100 container*/
 		let divContainer = document.getElementById('table100');
