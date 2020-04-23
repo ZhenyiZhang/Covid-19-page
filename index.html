@@ -34,7 +34,7 @@
 			<div class="inner"> <button onclick="CreateTables(deployurl + '/api/niagara')">
 				<span>Niagara Region</span>
 			</button> </div>
-			<div class="inner"> <button onclick="CreateOneTable(deployurl + '/api/peel')">
+			<div class="inner"> <button onclick="getPeelData()">
 				<span>Peel Region</span>
 			</button> </div>
 			<div class="inner"> <button onclick="getWaterlooTable()">
@@ -58,7 +58,15 @@
 	/*two url for local and cloud testing*/
 	const localurl = 'http://localhost:5000';
 	const deployurl = 'https://vast-reaches-02757.herokuapp.com';
-
+	async function getPeelData() {
+		let divContainer = document.getElementById('table100');
+		divContainer.innerHTML = '';
+		let sourceDisplay = document.createElement('embed');
+		sourceDisplay.src = 'https://peelregion.ca/health/professionals/pdfs/COVID-19/epi-update-20-17-04.pdf';
+		sourceDisplay.width='1200px';
+		sourceDisplay.height='2000px';
+		divContainer.appendChild(sourceDisplay);
+	}
 	async function getWaterlooTable() {
 		/*get waterloo.html content*/
 		let page = await fetch('./embeddedTable/waterloo.html');
