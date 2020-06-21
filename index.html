@@ -25,7 +25,7 @@
 <div class="limiter">
 	<div class="container-table100">
 		<div class="wrap-table100">
-			<div class="inner"><button onclick="CreateOneTable(deployurl + '/api/york')">
+			<div class="inner"><button onclick="getYorkTable()">
 				<span>York Region</span>
 			</button> </div>
 			<div class="inner"> <button onclick="CreateTables(deployurl + '/api/halton')">
@@ -96,6 +96,23 @@
 		let divElement = document.getElementById('viz1586561412981');
 		let vizElement = divElement.getElementsByTagName('object')[0];
 		vizElement.style.width='980px';vizElement.style.height='2527px';
+		let scriptElement = document.createElement('script');
+		scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+		vizElement.parentNode.insertBefore(scriptElement, vizElement);
+	}
+
+	async function getYorkTable() {
+		/*get waterloo.html content*/
+		let page = await fetch('./embeddedTable/york.html');
+		let divContainer = document.getElementById('table100');
+		/*insert waterloo.html inside 'table100'*/
+		divContainer.innerHTML = await page.text();
+		/*render table*/
+		let divElement = document.getElementById('viz1592752336252');
+		let vizElement = divElement.getElementsByTagName('object')[0];
+		if ( divElement.offsetWidth > 800 ) { vizElement.style.width='710px';vizElement.style.height='2327px';}
+		else if ( divElement.offsetWidth > 500 ) { vizElement.style.width='710px';vizElement.style.height='2327px';}
+		else { vizElement.style.width='100%';vizElement.style.height='2327px';}
 		let scriptElement = document.createElement('script');
 		scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
 		vizElement.parentNode.insertBefore(scriptElement, vizElement);
